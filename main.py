@@ -51,13 +51,20 @@ def main():
     """Main program entry point."""
     # Setup logging
     logger = setup_logging()
-    logger.info("Starting Travel Manager CDP")
+    logger.info("Starting Travel Manager CDP with DeepSeek V3")
     
     # Load environment variables
     load_dotenv()
     
+    # Check for OpenRouter API key
+    if not os.environ.get("OPENROUTER_API_KEY"):
+        logger.error("OPENROUTER_API_KEY environment variable is not set")
+        print("\n⚠️ ERROR: OPENROUTER_API_KEY environment variable is required.")
+        print("Please add your OpenRouter API key to the .env file and restart.")
+        sys.exit(1)
+    
     # Create the GAME Travel Manager agent
-    logger.info("Initializing Travel Manager Agent")
+    logger.info("Initializing Travel Manager Agent with DeepSeek V3")
     travel_manager, workers = create_travel_manager()
     travel_manager.compile()
     
@@ -70,7 +77,7 @@ def main():
     agentkit = None
     
     if operating_mode in [BLOCKCHAIN_AUTO_MODE, BLOCKCHAIN_CHAT_MODE]:
-        logger.info("Initializing CDP Agent")
+        logger.info("Initializing CDP Agent with DeepSeek V3")
         cdp_agent, cdp_config, agentkit = initialize_cdp_agent()
     
     # Run the appropriate mode
