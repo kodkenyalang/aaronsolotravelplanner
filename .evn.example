@@ -1,8 +1,0 @@
-.env
-
-# API Keys
-GAME_API_KEY=your_game_api_key_here
-OPENROUTER_API_KEY=your_openrouter_api_key_here
-
-# CDP Settings
-CDP_API_KEY=your_cdp_api_key_here
