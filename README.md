@@ -1,165 +1,236 @@
-# GAME Python SDK Library
-The GAME Python SDK is a library that allows you interact and develop agents powered by the GAME architecture.
+# UnoTravel
 
-## Overview of the Source Code Structure 
 
-There are 2 main folders in the source code (`src` folder)
+> An AI-powered travel management system with blockchain payment capabilities.
 
-1. `game`:
+## Overview
 
-    Please refer to [`test_agent.py`](examples/game/test_agent.py) and [`test_worker.py`](examples/game/test_worker.py) for usage examples.
+UnoTravel is an innovative travel management system that combines AI-powered travel planning with blockchain payment capabilities. It leverages the GAME Framework for orchestrating travel planning tasks and the Coinbase Developer Platform (CDP) AgentKit for blockchain payment processing.
 
-2. `hosted_game`<br/>
-
-    This is a more abstracted version of the SDK which allows one to deploy a Twitter agent, which would then be hosted by GAME infrastructure. 
-    
-    Note that this README focuses on the code in the `game` folder. More details about `hosted_game` can be found in [`src/hosted_game/README.md`](src/game_sdk/hosted_game/README.md).
-
-## Installation
-```bash
-pip install game_sdk
-```
-
-To get the latest version of the SDK, clone the repository and install from source:
-```bash
-git clone https://github.com/game-by-virtuals/game-python.git
-cd game-python
-pip install -e .
-```
-To install the latest versions of the plugins, navigate to the plugin folder to run the installation, e.g.:
-```bash
-cd plugins/twitter
-pip install -e .
-```
-
-## Model Selection
-The foundation models which power the GAME framework can also be confgiured and selected. This can be specified when creating agents or workers. The default model used is "Llama-3.1-405B-Instruct".
-
-The models currently supported are:
-- "Llama-3.1-405B-Instruct" (default)
-- "Llama-3.3-70B-Instruct"
-- "DeepSeek-R1"
-- "DeepSeek-V3"
-- "Qwen-2.5-72B-Instruct"
-
-**Note: If model is not specified in the API call (REST API level) or on the SDK level when creating the agents, the default (Llama-3.1-405B-Instruct) model will be used.
-
-## Usage
-1. `game`:
-   - Request for a GAME API key in the Game Console https://console.game.virtuals.io/ 
-   - Store the key in a safe location, like a `.bashrc` or a `.zshrc` file. 
-      
-      ```bash
-      export GAME_API_KEY="your_game_api_key"
-      ```
-   - Refer to [`src/game/README.md`](src/game_sdk/game/README.md) for usage guidelines, and refer to [`test_agent.py`](examples/game/test_agent.py) and [`test_worker.py`](examples/game/test_worker.py) for usage examples.
-
-2. `hosted_game`<br/>
-    - Open the [Virtuals Platform](https://app.virtuals.io/) and create/get an API key from the Agent Sandbox by clicking `SDK/API Access`
-      ![getGAMEApi](docs/imgs/accesskey.jpg)
-    
-    - Store the key in a safe location, like a `.bashrc` or a `.zshrc` file. 
-      
-      ```bash
-      export VIRTUALS_API_KEY="your_virtuals_api_key"
-      ```
-    - Refer to [`src/hosted_game/README.md`](src/game_sdk/hosted_game/README.md) for usage examples.
-  
-<small> If you have any trouble, contact Virtuals support or DevRel team members via Discord or Telegram </small>
-
-## Examples
-  ### GAME
-  Example 1: [`test_agent.py`](examples/game/test_agent.py) 
-  - Demonstrates how to create, configure, and run an AI agent with custom logic and workflows.
-    ```bash
-    python examples/game/test_agent.py
-    ```
-
-  Example 2: [`test_worker.py`](examples/game/test_worker.py)
-  - Demonstrates how to configure, test, and manage workers that execute tasks within the agent's plan.
-    ```bash
-    python examples/game/test_worker.py
-    ```
-
-  Example 3: [`example_twitter_reaction_module.py`](examples/game/example_twitter_reaction_module.py)
-  - Demonstrates how to create and configure an AI agent with a reaction module for responding to tweets in real-time.
-    ```bash
-    python examples/game/example_twitter_reaction_module.py
-    ```
-  
-  ### Hosted Agent
-  Example 1: [`example-custom.py`](examples/hosted_agent/example-custom.py) 
-  - A complete guide to integrating an AI agent with other platform such as Telegram.
-    ```bash
-    python examples/hosted_agent/example-custom.py
-    ```
-  
-  Example 2: [`example-twitter.py`](examples/hosted_agent/example-twitter.py)
-  - A complete guide to integrating an AI agent with Twitter.
-    ```bash
-    python examples/hosted_agent/example-twitter.py
-    ```
-
-## About G.A.M.E.
-GAME is a modular agentic framework which enables an agent to plan actions and make decisions autonomously based on information provided to it.
-
-Please refer to our [whitepaper](https://docs.game.virtuals.io/) for more information and resources.
-
-## About GAME Python SDK
-Currently, the SDK (specifically the code in the `game` folder) allows you to develop your agents powered by the GAME architecture in its most fullest and most flexible form.
-
-![New SDK visual](docs/imgs/new_sdk_visual.png)
-The python SDK is made up of 3 main components (Agent, Worker, function), each with configurable arguments.
-
-Agent (a.k.a. [high level planner](https://docs.game.virtuals.io/))
-- Takes in a <b>Goal</b>
-  - Drives the agents behaviour through the high level plan which influences the thinking and creation of tasks that would contribute towards this goal
-- Takes in a <b>Description</b>
-  - Combination of what was previously known as World Info + Agent Description
-  - This include a description of the "world" the agent lives in, and the personality and background of the agent
-
-Worker (a.k.a. [low-level planner](https://docs.game.virtuals.io/) 
-- Takes in a <b>Description</b>
-  - Used to control which workers are called by the agent, based on the high-level plan and tasks created to contribute to the goal
-
-Function
-- Takes in a <b>Description</b>
-  - Used to control which functions are called by the workers, based on each worker's low-level plan
-  - This can be any python executable
+The system demonstrates how to integrate modern AI-driven task planning with decentralized payment systems, providing a comprehensive travel planning experience with cryptocurrency payment options.
 
 ## Features
-- Develop your own custom agents for any application or platform. 
-- Ability to control your agents and workers via descriptions (prompts)
-- Full control of what the agent sees (state) and can do (actions/functions)
-- Ability to fully customise functions. This could include various combinations of programmed logic. For example:
-  - Calling an API to retrieve data
-  - Calling an API to retrieve data, followed by custom calculations or data processing logic in python code
-  - 2 API calls chained together (e.g. calling an API to retrieve web data, and then posting a tweet)
 
-> ### ℹ️ Differences from the hosted GAME SDK version (i.e. `hosted_game`)
->![Old SDK visual](docs/imgs/old_sdk_visual.png)
-> - Ability to fully customise functions (previously, each function was a single API call)
-> - Ability to control the low-level planner via description prompt (previously, only the high-level planner and functions could be controlled via description prompts)
-> - The description defined in the agent is equivalent to what was previously known as world information and agent description
+- 🧠 **AI-Powered Planning**: Utilizes DeepSeek V3 through OpenRouter for intelligent travel planning
+- 🔗 **Blockchain Payments**: Processes cryptocurrency payments via Coinbase Developer Platform
+- 👥 **Specialised Workers**: Dedicated workers for flights, hotels, experiences, and payments
+- 🔄 **Multiple Operation Modes**:
+  - **Automatic**: AI makes all travel decisions autonomously
+  - **Interactive**: User guides the AI travel decisions
+  - **Blockchain Auto**: AI makes travel & blockchain decisions autonomously
+  - **Blockchain Chat**: User guides both travel & blockchain decisions
+- 💼 **State Management**: Maintains state across both travel planning and blockchain operations
 
-## How to Contribute
-Want to help improve the project? Please see our detailed [Contribution Guide](./CONTRIBUTION_GUIDE.md).
+## System Architecture
 
-## Documentation
-Detailed documentation to better understand the configurable components and the GAME architecture can be found on [here](https://whitepaper.virtuals.io/developer-documents/game-framework).
+```
+aaronsolotravelplanner/
+├── src/
+│   ├── game_agents/       # GAME framework agents & workers
+│   ├── cdp_integration/   # Coinbase Developer Platform integration
+│   ├── utils/             # Utility functions & state management
+│   └── modes/             # Different operational modes
+```
 
-## Useful Resources
+The system is designed with a modular architecture:
 
-#### 1. [GAME TypeScript SDK](https://github.com/game-by-virtuals/game-node)
-   - This SDK mirrors the logic of the Python SDK but allows development in TypeScript.
-   - The repository contains TypeScript SDK documentation and [contributed plugins](https://github.com/game-by-virtuals/game-node/tree/main/plugins) .
+1. **GAME Framework Integration**: Uses GAME SDK to orchestrate travel planning through specialized workers
+2. **CDP AgentKit Integration**: Connects to blockchain networks to process crypto payments
+3. **OpenRouter Integration**: Leverages DeepSeek V3 for advanced natural language understanding
+4. **Mode-based Execution**: Supports different operational modes for flexibility
 
-#### 2. [Hosted GAME Agent](./src/game_sdk/hosted_game/README.md)
-   - This feature enables the configuration and deployment of a hosted agent that interacts with platforms like Twitter/X.
-   - Pre-built functions and actions are included for integration with the Twitter/X platform.
-   - It offers a similar experience to configuring an agent in the [Agent Sandbox](https://game-lite.virtuals.io/) on the [Virtuals Platform](https://app.virtuals.io/), but with a developer-friendly SDK interface.
+## Installation
 
-#### 3. [GAME Whitepaper](https://whitepaper.virtuals.io/developer-documents/game-framework)
-   - Comprehensive documentation about the GAME SDK and Sandbox.
-   - The [How To](https://docs.game.virtuals.io/how-to) section includes video tutorials, use cases, and additional tips.
-   - Content is regularly updated to provide new insights and improvements.
+1. Clone the repository:
+   ```bash
+   git clone kodkenyalang/aaronsolotravelplanner/final.git
+   cd travel-manager-cdp
+   ```
+
+2. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Create a `.env` file with your API keys:
+   ```
+   GAME_API_KEY=your_game_api_key_here
+   OPENROUTER_API_KEY=your_openrouter_api_key_here
+   CDP_API_KEY=your_cdp_api_key_here
+   ```
+
+## Usage
+
+Run the application:
+```bash
+python main.py
+```
+
+Follow the prompts to select an operating mode:
+1. **Automatic Mode**: AI makes all travel decisions
+2. **Interactive Mode**: You guide the AI travel decisions
+3. **Blockchain Auto Mode**: AI makes travel & blockchain decisions
+4. **Blockchain Chat Mode**: You guide travel & blockchain decisions
+
+### Example Interaction (Interactive Mode)
+
+```
+🔄 Select Operating Mode:
+1. Automatic Mode - AI makes all travel decisions
+2. Interactive Mode - You guide the AI travel decisions
+3. Blockchain Auto Mode - AI makes travel & blockchain decisions
+4. Blockchain Chat Mode - You guide travel & blockchain decisions
+
+Enter choice (1-4): 2
+
+👤 Running in INTERACTIVE MODE - You'll guide the AI decisions
+
+📊 Initial State:
+{
+    "customer_satisfaction": 0,
+    "budget_remaining": 1000,
+    "trip_completeness": 0,
+    "interaction_mode": "interactive",
+    "blockchain_enabled": false,
+    "wallet_balance": 0,
+    "wallet_tokens": {
+        "ETH": "0",
+        "USDC": "0",
+        "USDT": "0",
+        "DAI": "0"
+    }
+}
+
+📊 Current Status:
+Budget: $1000
+Satisfaction: 0
+Trip Completeness: 0%
+
+🤔 AI Recommendation:
+Based on the current state, the AI would recommend the next steps...
+
+⚠️ Confirm action: Would you like to see what the AI recommends? (y/n): y
+
+💡 AI Recommends: Based on the current state of planning, you should:
+- Gather customer preferences first
+- Research potential destinations
+
+🧰 Available Workers:
+1. TRAVEL_CONSULTANT - Collects and analyzes customer travel preferences and requirements.
+   Actions:
+   1. gather_preferences - Gather travel preferences from the customer
+
+[...]
+```
+
+### Example Interaction (Blockchain Chat Mode)
+
+```
+🔄 Select Operating Mode:
+1. Automatic Mode - AI makes all travel decisions
+2. Interactive Mode - You guide the AI travel decisions
+3. Blockchain Auto Mode - AI makes travel & blockchain decisions
+4. Blockchain Chat Mode - You guide travel & blockchain decisions
+
+Enter choice (1-4): 4
+
+👤🔗 Running in BLOCKCHAIN CHAT MODE - You'll guide AI decisions with blockchain options
+
+🔗 Initializing blockchain connection through CDP AgentKit...
+Fetching network information...
+Connected to network: base-sepolia
+Wallet address: 0x1234...abcd
+
+📊 Initial State:
+{
+    "customer_satisfaction": 0,
+    "budget_remaining": 1000,
+    "trip_completeness": 0,
+    "interaction_mode": "blockchain_chat",
+    "blockchain_enabled": true,
+    "wallet_balance": 100,
+    "wallet_tokens": {
+        "ETH": "0.1",
+        "USDC": "100",
+        "USDT": "100",
+        "DAI": "100"
+    }
+}
+
+[...]
+
+💰 Blockchain Payment Options:
+1. Check wallet balance
+2. Request funds from faucet
+3. Process payment for travel service
+4. Swap tokens (e.g., ETH to USDC)
+5. Transfer tokens to another address
+6. Get token price
+7. Explore DeFi options
+
+Select blockchain action (1-7): 3
+
+Enter payment amount: 100
+Enter currency (e.g., ETH, USDC): USDC
+Enter service type (flight, hotel, experience): hotel
+
+⚠️ Confirm action: Process payment of 100 USDC for hotel (y/n): y
+Processing payment...
+Transaction hash: 0x5678...efgh
+Payment completed successfully!
+```
+
+## API Reference
+
+### GAME Framework
+
+The application uses the GAME SDK to orchestrate travel planning:
+
+- **Agent**: Central Travel Manager that coordinates tasks
+- **Workers**: Specialized workers for different travel tasks
+- **Functions**: Task implementations for travel operations
+
+### Coinbase Developer Platform
+
+The CDP integration enables blockchain operations:
+
+- **Wallet Management**: Create and manage blockchain wallets
+- **Token Operations**: Check balances, swap tokens, transfer tokens
+- **Payment Processing**: Process crypto payments for travel services
+
+### OpenRouter
+
+DeepSeek V3 through OpenRouter powers the intelligent capabilities:
+
+- **Natural Language Understanding**: Process user travel preferences
+- **Decision Making**: Select optimal travel options
+- **Task Planning**: Orchestrate complex travel arrangements
+
+## DeepSeek V3 Integration
+
+This project leverages DeepSeek V3 through the OpenRouter API for all AI interactions:
+
+- **High-quality Language Understanding**: Better comprehension of travel preferences and requirements
+- **Improved Decision-Making**: More sophisticated travel planning recommendations
+- **Natural Interactions**: Enhanced conversational capabilities for better user experience
+- **Blockchain Comprehension**: Advanced understanding of blockchain concepts for payment processing
+
+The integration with DeepSeek V3 allows the system to provide more nuanced travel recommendations and better understand complex user requests, significantly improving the quality of the travel planning experience.
+
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [GAME Framework](https://github.com/game-by-virtuals/game-python) for agent orchestration
+- [Coinbase Developer Platform](https://www.coinbase.com/cloud/products/developer-platform) for blockchain integration
+- [OpenRouter](https://openrouter.ai/) for providing access to DeepSeek V3 and other models
+- [DeepSeek](https://deepseek.com) for their advanced language model technology
