@@ -1,34 +1,86 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
-name = "game_sdk"
-version = "0.1.5"
-authors = [
-  { name = "Your Name", email = "your.email@example.com" },
-]
-description = "Official Python SDK for GAME by Virtuals"
+name = "travel-manager-cdp"
+version = "0.1.0"
+description = "AI-powered travel management system with blockchain payment capabilities"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Travel Manager CDP Team", email = "example@example.com"}
+]
 classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "typing-extensions>=4.0.0",
-    "requests>=2.26.0",
-    "pydantic>=2.10.5"
+    "coinbase-agentkit>=0.1.1",
+    "coinbase-agentkit-langchain>=0.1.1",
+    "game-sdk",
+    "langchain-core",
+    "langchain-openrouter>=0.0.5",
+    "langgraph",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+    "openrouter>=0.2.0",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "black>=23.1.0",
+    "flake8>=6.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.0.0",
+    "pytest>=7.2.1",
+    "pytest-cov>=4.0.0",
+]
+
+[tool.setuptools]
+packages = ["src"]
+
+[tool.black]
+line-length = 88
+target-version = ["py39", "py310", "py311"]
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+
+[[tool.mypy.overrides]]
+module = [
+    "game_sdk.*",
+    "coinbase_agentkit.*", 
+    "coinbase_agentkit_langchain.*",
+    "langchain_openrouter.*",
+    "langgraph.*",
+    "openrouter.*"
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "--cov=src"
+
 [project.urls]
-"Homepage" = "https://github.com/game-by-virtuals/game-python"
-"Bug Tracker" = "https://github.com/game-by-virtuals/game-python"
+"Homepage" = "https://github.com/kodkenyalang/aaronsolotravelplanner/edit/final"
