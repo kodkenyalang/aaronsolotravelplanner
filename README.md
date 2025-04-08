@@ -43,7 +43,7 @@ The system is designed with a modular architecture:
 
 1. Clone the repository:
    ```bash
-   git clone kodkenyalang/aaronsolotravelplanner/blob/final/.git
+   git clone kodkenyalang/aaronsolotravelplanner/tree/final.git
    cd aaronsolotravelplanner
    ```
 
@@ -234,3 +234,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Coinbase Developer Platform](https://www.coinbase.com/cloud/products/developer-platform) for blockchain integration
 - [OpenRouter](https://openrouter.ai/) for providing access to DeepSeek V3 and other models
 - [DeepSeek](https://deepseek.com) for their advanced language model technology
+
+## Contact
+For further queries contact aaron.ong@zoho.com
+
