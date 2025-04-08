@@ -3,7 +3,7 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "travel-manager-cdp"
+name = "UnoTravel"
 version = "0.1.0"
 description = "AI-powered travel management system with blockchain payment capabilities"
 readme = "README.md"
