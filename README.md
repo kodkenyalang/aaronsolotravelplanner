@@ -43,8 +43,8 @@ The system is designed with a modular architecture:
 
 1. Clone the repository:
    ```bash
-   git clone kodkenyalang/aaronsolotravelplanner/final.git
-   cd travel-manager-cdp
+   git clone kodkenyalang/aaronsolotravelplanner/blob/final/.git
+   cd aaronsolotravelplanner
    ```
 
 2. Create a virtual environment:
