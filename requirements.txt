@@ -2,7 +2,8 @@ coinbase-agentkit>=0.1.1
 coinbase-agentkit-langchain>=0.1.1
 game-sdk
 langchain-core
-langchain-openai
+langchain-openrouter
 langgraph
 python-dotenv>=1.0.0
 requests>=2.31.0
+openrouter>=0.2.0
