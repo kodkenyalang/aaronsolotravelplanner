@@ -1,9 +1,11 @@
-"""Blockchain payments mode for travel manager."""
+"""Blockchain payments mode for UnoTravel."""
 
 import time
-from typing import Dict, Any
+from typing import Dict, Any, Optional, List
+import json
+from decimal import Decimal
 
-from src.game_agents.agent import TravelManagerAgent
+from src.game_agents.agent import UnoTravelAgent
 from src.utils.state import StateManager
 from src.cdp_integration.client import CDPClient
 from src.cdp_integration.wallet import WalletManager
@@ -12,280 +14,345 @@ from src.blockchain.contract_client import ContractClient
 from src.blockchain.token_registry import TokenRegistry
 
 class BlockchainPaymentsMode:
-    """Mode for managing travel with blockchain payments."""
+    """Mode for processing payments with blockchain integration."""
     
     def __init__(self):
         """Initialize the blockchain payments mode."""
+        self.agent = UnoTravelAgent()
         self.state_manager = StateManager()
-        self.agent = TravelManagerAgent()
         self.cdp_client = CDPClient()
         self.wallet_manager = WalletManager(self.cdp_client)
         self.payment_processor = PaymentProcessor(self.cdp_client)
+        
+        # Initialize blockchain components
         self.contract_client = ContractClient()
         self.token_registry = TokenRegistry()
         
-        # Connect to the blockchain
-        self.cdp_client.connect_to_network("base-sepolia")
+        print("UnoTravel Blockchain Payments Mode Initialized")
         
-        # Update state with blockchain settings
-        self.state_manager.update_state({
-            "blockchain_enabled": True,
-            "interaction_mode": "blockchain_payments"
-        })
-    
     def run(self):
         """Run the blockchain payments mode."""
-        print("\n===== Travel Manager with Blockchain Payments =====\n")
-        print("This mode allows you to manage your travel plans with blockchain payments.")
-        print("You can use your crypto tokens to pay for travel services.\n")
+        print("Welcome to UnoTravel - Blockchain Payments")
+        print("------------------------------------------")
         
-        # Check wallet balance
-        self._check_wallet_balance()
+        # Load user profile
+        user_id = self._get_or_create_user()
+        user_profile = self.cdp_client.get_user_profile(user_id)
         
+        # Main interaction loop
         while True:
             print("\nWhat would you like to do?")
-            print("1. Plan a trip")
-            print("2. View wallet balance")
-            print("3. Make a payment")
-            print("4. View transaction history")
-            print("5. View loyalty points")
-            print("6. Redeem loyalty points")
-            print("7. Swap tokens")
-            print("8. Exit")
+            print("1. View available payment tokens")
+            print("2. Make a payment for travel services")
+            print("3. View payment history")
+            print("4. View loyalty points")
+            print("5. Redeem loyalty points")
+            print("6. View wallet balances")
+            print("7. Exit")
             
-            choice = input("\nEnter your choice (1-8): ")
+            choice = input("Enter your choice (1-7): ")
             
             if choice == "1":
-                self._plan_trip()
+                self._view_payment_tokens()
             elif choice == "2":
-                self._check_wallet_balance()
+                self._make_payment(user_id)
             elif choice == "3":
-                self._make_payment()
+                self._view_payment_history()
             elif choice == "4":
-                self._view_transaction_history()
-            elif choice == "5":
                 self._view_loyalty_points()
-            elif choice == "6":
+            elif choice == "5":
                 self._redeem_loyalty_points()
+            elif choice == "6":
+                self._view_wallet_balances()
             elif choice == "7":
-                self._swap_tokens()
-            elif choice == "8":
-                print("\nThank you for using Travel Manager with Blockchain Payments!")
+                print("Thank you for using UnoTravel Blockchain Payments!")
                 break
             else:
-                print("\nInvalid choice. Please try again.")
+                print("Invalid choice. Please try again.")
     
-    def _check_wallet_balance(self):
-        """Check and display the wallet balance."""
-        print("\nChecking wallet balance...")
-        try:
-            balance = self.wallet_manager.get_wallet_balance()
-            self.state_manager.update_state({"wallet_tokens": balance})
+    def _get_or_create_user(self) -> str:
+        """Get or create a user ID.
+        
+        Returns:
+            User ID
+        """
+        # Check for existing user ID in state
+        user_id = self.state_manager.get("user_id")
+        
+        if not user_id:
+            print("Let's create a new UnoTravel profile...")
+            name = input("Enter your name: ")
+            email = input("Enter your email: ")
             
-            print("\nWallet Balance:")
-            for token, amount in balance.items():
-                print(f"  {token}: {amount}")
-        except Exception as e:
-            print(f"\nError checking wallet balance: {str(e)}")
+            # Create user in CDP
+            user_id = self.cdp_client.create_user({
+                "name": name,
+                "email": email,
+                "wallet_address": self.contract_client.address
+            })
+            
+            # Save user ID to state
+            self.state_manager.set("user_id", user_id)
+            
+            print(f"Welcome to UnoTravel, {name}!")
+        else:
+            user_profile = self.cdp_client.get_user_profile(user_id)
+            print(f"Welcome back, {user_profile['name']}!")
+        
+        return user_id
     
-    def _plan_trip(self):
-        """Plan a trip using the travel agent."""
-        print("\nLet's plan your trip!")
-        destination = input("Where would you like to go? ")
+    def _view_payment_tokens(self):
+        """View available payment tokens."""
+        print("\nAvailable Payment Tokens:")
+        print("-------------------------")
         
-        # Process the query through the agent
-        print("\nProcessing your request...")
-        result = self.agent.process_query(f"I want to go to {destination}")
-        
-        print("\nTravel Agent Response:")
-        print(result["response"])
-        
-        # Update the state with the planning info
-        if "selected_destination" in result:
-            self.state_manager.update_state(result)
-    
-    def _make_payment(self):
-        """Make a payment for a travel service."""
-        print("\nMake a Payment")
-        
-        # Get payment details
-        service_type = input("What are you paying for? (flight/hotel/experience): ")
-        amount = float(input("Amount to pay: "))
-        
-        # Show available tokens
         tokens = self.token_registry.get_supported_tokens()
-        print("\nAvailable tokens:")
-        for i, token in enumerate(tokens):
-            print(f"  {i+1}. {token}")
         
-        token_index = int(input("\nSelect token (number): ")) - 1
-        token = tokens[token_index]
+        for i, token in enumerate(tokens, 1):
+            token_info = self.contract_client.get_token_info(token["address"])
+            
+            # Check if token is supported by the contract
+            is_supported = self.contract_client.is_supported_token(token["address"])
+            status = "✓ Supported" if is_supported else "✗ Not supported"
+            
+            print(f"{i}. {token_info['name']} ({token_info['symbol']})")
+            print(f"   Address: {token['address']}")
+            print(f"   Status: {status}")
+            print(f"   Decimals: {token_info['decimals']}")
+            print()
+    
+    def _make_payment(self, user_id: str):
+        """Make a payment for travel services.
         
-        # Confirm the payment
-        print(f"\nYou are about to pay {amount} {token} for {service_type}.")
-        confirm = input("Confirm payment? (y/n): ")
+        Args:
+            user_id: User ID
+        """
+        print("\nMake a Payment for UnoTravel Services")
+        print("------------------------------------")
         
+        # Get available tokens
+        tokens = self.token_registry.get_supported_tokens()
+        
+        # Display token options
+        print("Available payment tokens:")
+        for i, token in enumerate(tokens, 1):
+            token_info = self.contract_client.get_token_info(token["address"])
+            balance = self.contract_client.get_token_balance(token["address"])
+            print(f"{i}. {token_info['symbol']} - Balance: {balance}")
+        
+        # Get token selection
+        token_index = int(input("\nSelect token to pay with (number): ")) - 1
+        if token_index < 0 or token_index >= len(tokens):
+            print("Invalid token selection.")
+            return
+        
+        selected_token = tokens[token_index]
+        token_info = self.contract_client.get_token_info(selected_token["address"])
+        
+        # Get service type
+        print("\nService types:")
+        print("1. Flight")
+        print("2. Hotel")
+        print("3. Experience")
+        
+        service_type_index = int(input("Select service type (number): "))
+        if service_type_index == 1:
+            service_type = "flight"
+        elif service_type_index == 2:
+            service_type = "hotel"
+        elif service_type_index == 3:
+            service_type = "experience"
+        else:
+            print("Invalid service type.")
+            return
+        
+        # Get amount
+        amount_str = input(f"\nEnter amount to pay in {token_info['symbol']}: ")
+        try:
+            amount = Decimal(amount_str)
+        except:
+            print("Invalid amount.")
+            return
+        
+        # Get recipient
+        recipient = input("\nEnter recipient address (leave empty for default UnoTravel provider): ")
+        if not recipient:
+            # Use default service provider for UnoTravel
+            if service_type == "flight":
+                recipient = "0x1234567890123456789012345678901234567890"  # Example flight provider
+            elif service_type == "hotel":
+                recipient = "0x2345678901234567890123456789012345678901"  # Example hotel provider
+            else:
+                recipient = "0x3456789012345678901234567890123456789012"  # Example experience provider
+        
+        # Confirm payment
+        print("\nPayment Details:")
+        print(f"Token: {token_info['symbol']} ({selected_token['address']})")
+        print(f"Amount: {amount}")
+        print(f"Service Type: {service_type}")
+        print(f"Recipient: {recipient}")
+        
+        confirm = input("\nConfirm payment? (y/n): ")
         if confirm.lower() != "y":
             print("Payment cancelled.")
             return
         
+        # Process payment
         try:
-            # Process the payment
-            print("\nProcessing payment...")
-            tx_hash = self.payment_processor.process_payment(amount, token, service_type)
+            payment_result = self.contract_client.process_payment(
+                selected_token["address"],
+                amount,
+                service_type,
+                recipient
+            )
             
-            print(f"\nPayment successful!")
-            print(f"Transaction hash: {tx_hash}")
+            # Record payment in CDP
+            self.payment_processor.record_payment(
+                user_id,
+                {
+                    "payment_id": payment_result["payment_id"],
+                    "token": token_info["symbol"],
+                    "amount": str(amount),
+                    "service_type": service_type,
+                    "recipient": recipient,
+                    "transaction_hash": payment_result["receipt"]["transactionHash"].hex()
+                }
+            )
             
-            # Update wallet balance
-            self._check_wallet_balance()
+            print("\nPayment successful!")
+            print(f"Payment ID: {payment_result['payment_id']}")
+            print(f"Transaction Hash: {payment_result['receipt']['transactionHash'].hex()}")
             
-            # Update state
-            state = self.state_manager.get_state()
-            if "payments" not in state:
-                state["payments"] = []
-            
-            state["payments"].append({
-                "service_type": service_type,
-                "amount": amount,
-                "currency": token,
-                "tx_hash": tx_hash,
-                "timestamp": int(time.time())
-            })
-            
-            self.state_manager.update_state(state)
         except Exception as e:
-            print(f"\nError processing payment: {str(e)}")
+            print(f"\nPayment failed: {str(e)}")
     
-    def _view_transaction_history(self):
-        """View transaction history."""
-        print("\nTransaction History")
+    def _view_payment_history(self):
+        """View payment history."""
+        print("\nPayment History")
+        print("--------------")
         
-        try:
-            history = self.payment_processor.get_transaction_history()
-            
-            if not history["payments"]:
-                print("No transactions found.")
-                return
-            
-            for i, payment in enumerate(history["payments"]):
-                amount = payment["amount"] / (10 ** 18)  # Convert from wei
-                print(f"\nTransaction {i+1}:")
-                print(f"  Service: {payment['service_type']}")
-                print(f"  Amount: {amount}")
-                print(f"  Token: {payment['token']}")
-                print(f"  Timestamp: {time.ctime(payment['timestamp'])}")
-                print(f"  Refunded: {'Yes' if payment['refunded'] else 'No'}")
-                print(f"  Payment ID: {payment['payment_id']}")
-        except Exception as e:
-            print(f"\nError retrieving transaction history: {str(e)}")
+        payments = self.contract_client.get_user_payments()
+        
+        if not payments:
+            print("No payments found.")
+            return
+        
+        for i, payment in enumerate(payments, 1):
+            print(f"{i}. Payment ID: {payment['payment_id']}")
+            print(f"   Amount: {payment['amount']} {payment['token_symbol']}")
+            print(f"   Service Type: {payment['service_type']}")
+            print(f"   Timestamp: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(payment['timestamp']))}")
+            print(f"   Status: {'Refunded' if payment['refunded'] else 'Completed'}")
+            print()
     
     def _view_loyalty_points(self):
-        """View loyalty points balance."""
-        print("\nLoyalty Points")
+        """View loyalty points."""
+        print("\nUnoTravel Loyalty Points")
+        print("----------------------")
         
-        try:
-            points = self.payment_processor.get_loyalty_points()
-            print(f"You have {points} loyalty points.")
-            
-            # Also show loyalty token balance if available
-            try:
-                token_balance = self.contract_client.get_loyalty_token_balance(
-                    self.contract_client.account.address
-                )
-                token_balance_eth = token_balance / (10 ** 18)  # Convert from wei
-                print(f"You have {token_balance_eth} TLT (Travel Loyalty Tokens).")
-            except Exception:
-                pass  # Ignore errors with loyalty token
-        except Exception as e:
-            print(f"\nError retrieving loyalty points: {str(e)}")
+        points = self.contract_client.get_loyalty_points()
+        ult_balance = self.contract_client.get_token_balance(self.contract_client.loyalty_token_address)
+        
+        print(f"Current Points: {points}")
+        print(f"ULT Token Balance: {ult_balance}")
+        
+        # Get points conversion rate
+        points_per_token = 100  # Example: 100 points = 1 ULT token
+        
+        print(f"\nConversion Rate: {points_per_token} points = 1 ULT token")
+        print(f"Redeemable Points: {points}")
+        print(f"Equivalent ULT Tokens: {points / points_per_token}")
     
     def _redeem_loyalty_points(self):
         """Redeem loyalty points for tokens."""
         print("\nRedeem Loyalty Points")
+        print("-------------------")
         
-        try:
-            # Show current points
-            points = self.payment_processor.get_loyalty_points()
-            print(f"You have {points} loyalty points.")
-            
-            if points == 0:
-                print("You don't have any loyalty points to redeem.")
-                return
-            
-            # Get redemption details
-            points_to_redeem = int(input("How many points do you want to redeem? "))
-            
-            if points_to_redeem > points:
-                print("You don't have enough points.")
-                return
-            
-            # Show available tokens
-            tokens = self.token_registry.get_supported_tokens()
-            print("\nAvailable tokens:")
-            for i, token in enumerate(tokens):
-                print(f"  {i+1}. {token}")
-            
-            token_index = int(input("\nSelect token to receive (number): ")) - 1
-            token = tokens[token_index]
-            
-            # Confirm redemption
-            estimated_value = (points_to_redeem / 100)  # 1 point = 0.01 tokens
-            print(f"\nYou will receive approximately {estimated_value} {token}.")
-            confirm = input("Confirm redemption? (y/n): ")
-            
-            if confirm.lower() != "y":
-                print("Redemption cancelled.")
-                return
-            
-            # Process the redemption
-            print("\nProcessing redemption...")
-            tx_hash = self.payment_processor.redeem_loyalty_points(points_to_redeem, token)
-            
-            print(f"\nRedemption successful!")
-            print(f"Transaction hash: {tx_hash}")
-            
-            # Update wallet balance
-            self._check_wallet_balance()
-        except Exception as e:
-            print(f"\nError redeeming loyalty points: {str(e)}")
-    
-    def _swap_tokens(self):
-        """Swap one token for another."""
-        print("\nSwap Tokens")
+        points = self.contract_client.get_loyalty_points()
         
-        # Show available tokens
-        tokens = self.token_registry.get_supported_tokens()
-        print("\nAvailable tokens:")
-        for i, token in enumerate(tokens):
-            print(f"  {i+1}. {token}")
-        
-        from_index = int(input("\nFrom token (number): ")) - 1
-        from_token = tokens[from_index]
-        
-        to_index = int(input("To token (number): ")) - 1
-        to_token = tokens[to_index]
-        
-        amount = input(f"Amount of {from_token} to swap: ")
-        
-        # Confirm the swap
-        print(f"\nYou are about to swap {amount} {from_token} for {to_token}.")
-        confirm = input("Confirm swap? (y/n): ")
-        
-        if confirm.lower() != "y":
-            print("Swap cancelled.")
+        if points == 0:
+            print("You don't have any loyalty points to redeem.")
             return
         
+        # Get points to redeem
+        points_to_redeem_str = input(f"You have {points} points. How many points would you like to redeem? ")
         try:
-            # Process the swap
-            print("\nProcessing swap...")
-            result = self.payment_processor.swap_tokens(from_token, to_token, amount)
+            points_to_redeem = int(points_to_redeem_str)
+            if points_to_redeem <= 0 or points_to_redeem > points:
+                print("Invalid points amount.")
+                return
+        except:
+            print("Invalid points amount.")
+            return
+        
+        # Get available tokens
+        tokens = self.token_registry.get_supported_tokens()
+        
+        # Display token options
+        print("\nAvailable tokens to receive:")
+        for i, token in enumerate(tokens, 1):
+            token_info = self.contract_client.get_token_info(token["address"])
+            print(f"{i}. {token_info['symbol']}")
+        
+        # Default to ULT token
+        print(f"{len(tokens) + 1}. ULT (UnoTravel Loyalty Token)")
+        
+        # Get token selection
+        token_index = int(input("\nSelect token to receive (number): ")) - 1
+        if token_index < 0 or token_index > len(tokens):
+            print("Invalid token selection.")
+            return
+        
+        if token_index == len(tokens):
+            # ULT token
+            selected_token_address = self.contract_client.loyalty_token_address
+        else:
+            selected_token_address = tokens[token_index]["address"]
+        
+        token_info = self.contract_client.get_token_info(selected_token_address)
+        
+        # Confirm redemption
+        print("\nRedemption Details:")
+        print(f"Points to Redeem: {points_to_redeem}")
+        print(f"Token to Receive: {token_info['symbol']}")
+        
+        confirm = input("\nConfirm redemption? (y/n): ")
+        if confirm.lower() != "y":
+            print("Redemption cancelled.")
+            return
+        
+        # Process redemption
+        try:
+            redemption_result = self.contract_client.redeem_loyalty_points(
+                points_to_redeem,
+                selected_token_address
+            )
             
-            print(f"\nSwap successful!")
-            print(f"You swapped {result['fromAmount']} {result['fromToken']} for {result['toAmount']} {result['toToken']}")
-            print(f"Transaction hash: {result['txHash']}")
+            print("\nRedemption successful!")
+            print(f"Transaction Hash: {redemption_result['transactionHash'].hex()}")
             
-            # Update wallet balance
-            self._check_wallet_balance()
         except Exception as e:
-            print(f"\nError processing swap: {str(e)}")
+            print(f"\nRedemption failed: {str(e)}")
+    
+    def _view_wallet_balances(self):
+        """View wallet balances."""
+        print("\nWallet Balances")
+        print("--------------")
+        
+        print(f"Wallet Address: {self.contract_client.address}")
+        
+        # Get ETH balance
+        eth_balance = self.contract_client.get_eth_balance()
+        print(f"ETH: {eth_balance}")
+        
+        # Get ULT balance
+        ult_balance = self.contract_client.get_token_balance(self.contract_client.loyalty_token_address)
+        print(f"ULT: {ult_balance}")
+        
+        # Get other token balances
+        tokens = self.token_registry.get_supported_tokens()
+        
+        for token in tokens:
+            balance = self.contract_client.get_token_balance(token["address"])
+            token_info = self.contract_client.get_token_info(token["address"])
+            print(f"{token_info['symbol']}: {balance}")
