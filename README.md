@@ -132,9 +132,6 @@ UnoTravel leverages blockchain technology for:
 - **Transaction Verification**: Immutable record of all travel bookings
 - **Smart Contract Automation**: Automatic refunds and loyalty point distribution
 
-## Contributing
-
-We welcome contributions to UnoTravel! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) guide for details on the development process, coding standards, and pull request procedure.
 
 ## License
 
