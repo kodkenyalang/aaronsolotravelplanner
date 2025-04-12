@@ -1,17 +1,21 @@
-### UnoTravel - Blockchain Travel Planning Platform
-Project Overview
+# UnoTravel - Blockchain Travel Planning Platform
+
+One-stop travel platform with AI planning and blockchain payments
+
+## Project Overview
 
 UnoTravel is a comprehensive travel planning platform that combines intelligent agent-based trip planning with blockchain payment capabilities. Built on the GAME Framework, UnoTravel offers seamless coordination of flights, accommodations, and experiences while supporting cryptocurrency payments through Coinbase Developer Platform integration.
 
-### Key Features
+## Key Features
 
-Intelligent Trip Planning: Coordinate all aspects of travel using specialized worker agents
-Blockchain Payments: Pay for travel services using cryptocurrency
-Loyalty Program: Earn ULT (UnoTravel Loyalty Tokens) for discounts and rewards
-Multi-Mode Operation: Choose from automatic, interactive, and blockchain-enabled modes
+- **Intelligent Trip Planning**: Coordinate all aspects of travel using specialized worker agents
+- **Blockchain Payments**: Pay for travel services using cryptocurrency
+- **Loyalty Program**: Earn ULT (UnoTravel Loyalty Tokens) for discounts and rewards
+- **Multi-Mode Operation**: Choose from automatic, interactive, and blockchain-enabled modes
 
-### Directory Structure
+## Directory Structure
 
+```
 /
 ├── README.md                  # Project documentation
 ├── LICENSE                    # Project license (UnoTravel copyright)
@@ -63,69 +67,82 @@ Multi-Mode Operation: Choose from automatic, interactive, and blockchain-enabled
     ├── test_blockchain.py     # Blockchain integration tests
     ├── test_cdp.py            # CDP integration tests
     └── test_agents.py         # Agent tests
+```
 
-### Installation
+## Installation
 
-Clone the repository:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-organization/UnoTravel.git
+   cd UnoTravel
+   ```
 
-git clone https://github.com/your-organization/UnoTravel.git
-cd UnoTravel
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   npm install
+   ```
 
-Install dependencies:
+3. Set up environment variables:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your API keys and configuration
+   ```
 
-pip install -r requirements.txt
-npm install
+4. Deploy smart contracts:
+   ```bash
+   npx hardhat run scripts/deploy.js --network sepolia
+   ```
 
-Set up environment variables:
+5. Run the application:
+   ```bash
+   python main.py
+   ```
 
-cp .env.example .env
-# Edit .env with your API keys and configuration
-
-### Deploy smart contracts:
-
-npx hardhat run scripts/deploy.js --network sepolia
-
-### Run the application:
-
-python main.py
-
-### Usage
+## Usage
 
 UnoTravel supports four primary modes of operation:
 
-Automatic Mode: The system autonomously plans trips based on preferences.
+1. **Automatic Mode**: The system autonomously plans trips based on preferences.
+   ```bash
+   python main.py --mode automatic
+   ```
 
-python main.py --mode automatic
+2. **Interactive Mode**: Engage in a conversation-driven planning process.
+   ```bash
+   python main.py --mode interactive
+   ```
 
-Interactive Mode: Engage in a conversation-driven planning process.
+3. **Blockchain Auto Mode**: Autonomous planning with blockchain payments.
+   ```bash
+   python main.py --mode blockchain-auto
+   ```
 
-python main.py --mode interactive
+4. **Blockchain Chat Mode**: Interactive planning with blockchain payments.
+   ```bash
+   python main.py --mode blockchain-chat
+   ```
 
-Blockchain Auto Mode: Autonomous planning with blockchain payments.
-
-python main.py --mode blockchain-auto
-
-Blockchain Chat Mode: Interactive planning with blockchain payments.
-
-python main.py --mode blockchain-chat
-
-### Blockchain Features
+## Blockchain Features
 
 UnoTravel leverages blockchain technology for:
 
-Secure Payments: Process travel payments using popular cryptocurrencies
-Loyalty Program: Earn and redeem ULT tokens for discounts
-Transaction Verification: Immutable record of all travel bookings
-Smart Contract Automation: Automatic refunds and loyalty point distribution
+- **Secure Payments**: Process travel payments using popular cryptocurrencies
+- **Loyalty Program**: Earn and redeem ULT tokens for discounts
+- **Transaction Verification**: Immutable record of all travel bookings
+- **Smart Contract Automation**: Automatic refunds and loyalty point distribution
 
+## Contributing
 
+We welcome contributions to UnoTravel! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) guide for details on the development process, coding standards, and pull request procedure.
 
-License
+## License
 
-This project is licensed under the terms of the UnoTravel License - see the LICENSE file for details.
+This project is licensed under the terms of the UnoTravel License - see the [LICENSE](LICENSE) file for details.
 
-Contact
+## Contact
 
 For questions or support, please contact:
+- Email: aaron.ong@zoho.com
 
-Email: aaron.ong@zoho.com
+
