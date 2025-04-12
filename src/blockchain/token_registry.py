@@ -8,7 +8,7 @@ BASE_SEPOLIA_TOKENS = {
     "USDT": "0x162B9566Ad6248B8836Cf5673129e7E66ae89F1C",
     "DAI": "0x5e6F1119354d85e95b81B2270260A6C1A7c2916E",
     "ETH": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",  # Special address for native ETH
-    "TLT": "0x..."  # To be filled with deployed TravelLoyaltyToken address
+    "ULT": "0x..."  # To be filled with deployed UnoLoyaltyToken address
 }
 
 # Token addresses on Base mainnet
@@ -17,7 +17,7 @@ BASE_MAINNET_TOKENS = {
     "USDT": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
     "DAI": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
     "ETH": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",  # Special address for native ETH
-    "TLT": "0x..."  # To be filled with deployed TravelLoyaltyToken address
+    "ULT": "0x..."  # To be filled with deployed UnoLoyaltyToken address
 }
 
 class TokenRegistry:
