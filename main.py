@@ -1,4 +1,4 @@
-"""Travel Manager CDP main entry point."""
+"""UnoTravel main entry point."""
 
 import os
 import argparse
@@ -11,18 +11,18 @@ from src.modes.blockchain_chat import BlockchainChatMode
 from src.modes.blockchain_payments import BlockchainPaymentsMode
 
 def main():
-    """Main entry point for the travel manager."""
+    """Main entry point for UnoTravel."""
     # Load environment variables
     load_dotenv()
     
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description="Travel Manager CDP")
+    parser = argparse.ArgumentParser(description="UnoTravel - AI-powered travel with blockchain payments")
     parser.add_argument(
         "--mode",
         type=str,
         choices=["auto", "interactive", "blockchain-auto", "blockchain-chat", "blockchain-payments"],
         default="interactive",
-        help="Mode to run the travel manager in"
+        help="Mode to run UnoTravel in"
     )
     args = parser.parse_args()
     
