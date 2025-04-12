@@ -1,27 +1,27 @@
 const { ethers } = require("hardhat");
 
 async function main() {
-  console.log("Deploying Travel Manager contracts to Base blockchain...");
+  console.log("Deploying UnoTravel contracts to Base blockchain...");
 
   // Get the contract factories
-  const TravelPaymentProcessor = await ethers.getContractFactory("TravelPaymentProcessor");
-  const TravelLoyaltyToken = await ethers.getContractFactory("TravelLoyaltyToken");
+  const UnoTravelPaymentProcessor = await ethers.getContractFactory("UnoTravelPaymentProcessor");
+  const UnoLoyaltyToken = await ethers.getContractFactory("UnoLoyaltyToken");
 
   // Deploy the loyalty token
-  const travelLoyaltyToken = await TravelLoyaltyToken.deploy();
-  await travelLoyaltyToken.deployed();
-  console.log(`TravelLoyaltyToken deployed to: ${travelLoyaltyToken.address}`);
+  const unoLoyaltyToken = await UnoLoyaltyToken.deploy();
+  await unoLoyaltyToken.deployed();
+  console.log(`UnoLoyaltyToken deployed to: ${unoLoyaltyToken.address}`);
 
   // Deploy the payment processor
-  const travelPaymentProcessor = await TravelPaymentProcessor.deploy();
-  await travelPaymentProcessor.deployed();
-  console.log(`TravelPaymentProcessor deployed to: ${travelPaymentProcessor.address}`);
+  const unoTravelPaymentProcessor = await UnoTravelPaymentProcessor.deploy();
+  await unoTravelPaymentProcessor.deployed();
+  console.log(`UnoTravelPaymentProcessor deployed to: ${unoTravelPaymentProcessor.address}`);
 
   // Setup the contracts
   console.log("Setting up contracts...");
 
   // Add the payment processor as a minter for the loyalty token
-  const addMinterTx = await travelLoyaltyToken.addMinter(travelPaymentProcessor.address);
+  const addMinterTx = await unoLoyaltyToken.addMinter(unoTravelPaymentProcessor.address);
   await addMinterTx.wait();
   console.log("Added payment processor as loyalty token minter");
 
@@ -31,20 +31,20 @@ async function main() {
   const USDT_ADDRESS = "0x162B9566Ad6248B8836Cf5673129e7E66ae89F1C"; // Example USDT on Base testnet
   const DAI_ADDRESS = "0x5e6F1119354d85e95b81B2270260A6C1A7c2916E";  // Example DAI on Base testnet
   
-  const addUSDCTx = await travelPaymentProcessor.addSupportedToken(USDC_ADDRESS);
+  const addUSDCTx = await unoTravelPaymentProcessor.addSupportedToken(USDC_ADDRESS);
   await addUSDCTx.wait();
   
-  const addUSDTTx = await travelPaymentProcessor.addSupportedToken(USDT_ADDRESS);
+  const addUSDTTx = await unoTravelPaymentProcessor.addSupportedToken(USDT_ADDRESS);
   await addUSDTTx.wait();
   
-  const addDAITx = await travelPaymentProcessor.addSupportedToken(DAI_ADDRESS);
+  const addDAITx = await unoTravelPaymentProcessor.addSupportedToken(DAI_ADDRESS);
   await addDAITx.wait();
   
   console.log("Added supported tokens to payment processor");
 
-  // Add travel loyalty token to supported tokens
-  const addTLTTx = await travelPaymentProcessor.addSupportedToken(travelLoyaltyToken.address);
-  await addTLTTx.wait();
+  // Add UnoTravel loyalty token to supported tokens
+  const addULTTx = await unoTravelPaymentProcessor.addSupportedToken(unoLoyaltyToken.address);
+  await addULTTx.wait();
   console.log("Added loyalty token to supported tokens");
 
   console.log("Deployment and setup complete!");
