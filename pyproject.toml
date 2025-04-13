@@ -86,7 +86,7 @@ description = ""
 authors = ["Aaron Ong <aaron.ong@zoho.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"  # Adjust Python version according to your needs
+python = ">=3.10,<4.0"  # Adjust Python version according to your needs
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
