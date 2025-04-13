@@ -86,7 +86,7 @@ addopts = "--cov=src"
 name = "your-project-name"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["Aaron Ong <aaron.ong@zoho.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"  # Adjust Python version according to your needs
